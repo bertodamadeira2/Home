@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Loft do Pilar</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+html,body{margin:0}
+
+/* Layout: viewer 3D a toda a largura com painel de notas ao lado (empilha no telemóvel). Mundo único escuro: carvão, carvalho, luz quente. */
+:root{
+  --bg:#141312; --panel:#1d1b19; --line:#34302b; --fg:#ece6dd; --muted:#a39a8e;
+  --oak:#b9874f; --warm:#f2b766; --steel:#7d93a6;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px;max-width:1400px;margin:0 auto;display:grid;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,4vw,44px);letter-spacing:-.01em;margin:0;line-height:1;text-wrap:balance}
+.sub{color:var(--muted);margin:6px 0 0;max-width:62ch}
+.tag{font-family:var(--mono);font-size:12px;color:var(--warm);letter-spacing:.08em;text-transform:uppercase}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px}
+@media (max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;min-width:0;border:1px solid var(--line);background:#0c0b0a;aspect-ratio:16/10;max-width:100%}
+@media (max-width:600px){.stage{aspect-ratio:4/5}}
+#c{display:block;width:100%;height:100%;touch-action:none}
+.views{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:6px;right:10px}
+button{font-family:var(--mono);font-size:12px;background:rgba(20,19,18,.82);color:var(--fg);border:1px solid var(--line);padding:6px 10px;cursor:pointer;letter-spacing:.03em}
+button:hover{border-color:var(--warm)}
+button:focus-visible{outline:2px solid var(--warm);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--warm);color:#1a1410;border-color:var(--warm)}
+.hint{position:absolute;right:10px;bottom:10px;font-family:var(--mono);font-size:11px;color:var(--muted);background:rgba(12,11,10,.7);padding:4px 8px}
+aside{display:grid;gap:16px;align-content:start;min-width:0}
+.box{border-top:1px solid var(--line);padding-top:12px;display:grid;gap:8px}
+h2{font-family:var(--display);font-weight:700;font-size:15px;margin:0;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-variant-numeric:tabular-nums}
+dt{color:var(--muted)} dd{margin:0;font-family:var(--mono);text-align:right}
+ol{margin:0;padding-left:18px;display:grid;gap:6px}
+li::marker{color:var(--warm);font-family:var(--mono)}
+.sw{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:baseline}
+.note{color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="tag">Santo António · Funchal · estudo prévio</div>
+      <h1>Loft do Pilar</h1>
+      <p class="sub">A loja de 6 × 11 m transformada em loft: tons escuros, estrutura em madeira, cozinha junto à entrada, casa de banho ao fundo e fachada com portas de contentor (a ideia do Carlos).</p>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="stage" id="stage">
+      <canvas id="c" aria-label="Modelo 3D do loft"></canvas>
+      <div class="views" role="group" aria-label="Vistas">
+        <button id="v-geral" aria-pressed="true">Vista geral</button>
+        <button id="v-entrada" aria-pressed="false">Da entrada</button>
+        <button id="v-mez" aria-pressed="false">Do mezanino</button>
+        <button id="v-planta" aria-pressed="false">Planta</button>
+      </div>
+      <div class="hint">arrastar para rodar · roda/pinça para zoom</div>
+    </div>
+
+    <aside>
+      <div class="box">
+        <h2>Pé-direito da loja</h2>
+        <div class="seg" role="group" aria-label="Pé-direito">
+          <button id="h-alto" aria-pressed="true">5,60 m · com mezanino</button>
+          <button id="h-baixo" aria-pressed="false">2,40 m · piso único</button>
+        </div>
+        <p class="note" id="h-note">Hipótese: a loja tem 2,40 + 3,20 m livres. O quarto fica num mezanino de madeira sobre a metade do fundo.</p>
+      </div>
+
+      <div class="box">
+        <h2>Áreas aproximadas</h2>
+        <dl id="areas"></dl>
+      </div>
+
+      <div class="box">
+        <h2>Da entrada para o fundo</h2>
+        <ol>
+          <li><span class="sw" style="background:#7d93a6"></span>Fachada com portas de contentor que abrem para fora e porta de vidro no meio, para dar luz natural.</li>
+          <li><span class="sw" style="background:#b9874f"></span>Cozinha em linha e ilha de madeira junto à entrada: os cheiros saem pela porta.</li>
+          <li><span class="sw" style="background:#4a4540"></span>Sala em pé-direito duplo, com escada de madeira encostada à parede direita.</li>
+          <li><span class="sw" style="background:#d9d2c5"></span>Casa de banho e arrumos ao fundo, por baixo do mezanino.</li>
+          <li><span class="sw" style="background:#f2b766"></span>Quarto no mezanino, com guarda em madeira virada para a sala.</li>
+        </ol>
+      </div>
+
+      <div class="box">
+        <h2>A confirmar</h2>
+        <p class="note">Isto é um estudo de ideias, não é o projeto de arquitetura. As medidas vêm das suas notas e serão afinadas com as plantas. O mezanino acrescenta área de construção, por isso tem de caber nos índices do lote (IU 0,80). Precisa de licença, juntamente com a mudança de loja para habitação.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+const W=6, D=11;               // largura e profundidade (m)
+let H=5.6;                      // pé-direito
+const MEZ_Z=-6, MEZ_TOP=2.6;    // mezanino da z=-6 até ao fundo
+const canvas=document.getElementById('c'), stage=document.getElementById('stage');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.0;
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0c0b0a);
+const camera=new THREE.PerspectiveCamera(50,1,0.05,100);
+const controls=new THREE.OrbitControls(camera,canvas);
+controls.enableDamping=true; controls.maxPolarAngle=Math.PI*0.495;
+
+// ---------- texturas geradas ----------
+function woodTex(base,dark,rep){
+  const c=document.createElement('canvas');c.width=256;c.height=256;const g=c.getContext('2d');
+  g.fillStyle=base;g.fillRect(0,0,256,256);
+  for(let i=0;i<60;i++){g.strokeStyle=dark;g.globalAlpha=Math.random()*0.35;g.lineWidth=Math.random()*2+0.5;
+    const y=Math.random()*256;g.beginPath();g.moveTo(0,y);
+    for(let x=0;x<=256;x+=16)g.lineTo(x,y+Math.sin(x/30+i)*3);g.stroke();}
+  g.globalAlpha=0.5;g.strokeStyle=dark;for(let y=0;y<256;y+=32){g.lineWidth=1.5;g.beginPath();g.moveTo(0,y);g.lineTo(256,y);g.stroke();}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep[0],rep[1]);t.encoding=THREE.sRGBEncoding;return t;
+}
+function plasterTex(){
+  const c=document.createElement('canvas');c.width=256;c.height=256;const g=c.getContext('2d');
+  g.fillStyle='#3a3734';g.fillRect(0,0,256,256);
+  for(let i=0;i<1400;i++){g.fillStyle=Math.random()<.5?'rgba(0,0,0,.08)':'rgba(255,255,255,.035)';
+    g.beginPath();g.arc(Math.random()*256,Math.random()*256,Math.random()*6,0,7);g.fill();}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(3,3);t.encoding=THREE.sRGBEncoding;return t;
+}
+function corrTex(){
+  const c=document.createElement('canvas');c.width=128;c.height=128;const g=c.getContext('2d');
+  g.fillStyle='#6f8597';g.fillRect(0,0,128,128);
+  for(let x=0;x<128;x+=16){const gr=g.createLinearGradient(x,0,x+16,0);gr.addColorStop(0,'#5a6e7f');gr.addColorStop(.5,'#93a8b9');gr.addColorStop(1,'#5a6e7f');g.fillStyle=gr;g.fillRect(x,0,16,128);}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1,4);t.encoding=THREE.sRGBEncoding;return t;
+}
+const M={
+  wall:new THREE.MeshStandardMaterial({map:plasterTex(),roughness:.95}),
+  floor:new THREE.MeshStandardMaterial({color:0x3d3a37,roughness:.7,metalness:.05}),
+  oak:new THREE.MeshStandardMaterial({map:woodTex('#a8763f','#3e2410',[1,1]),roughness:.65}),
+  oakDark:new THREE.MeshStandardMaterial({map:woodTex('#6b4424','#22130a',[1,1]),roughness:.7}),
+  beam:new THREE.MeshStandardMaterial({map:woodTex('#5a3a1e','#1c1008',[1,1]),roughness:.75}),
+  black:new THREE.MeshStandardMaterial({color:0x1b1a19,roughness:.6}),
+  sofa:new THREE.MeshStandardMaterial({color:0x1f1e1d,roughness:.95}),
+  white:new THREE.MeshStandardMaterial({color:0xd9d2c5,roughness:.4}),
+  linen:new THREE.MeshStandardMaterial({color:0xcfc8bb,roughness:1}),
+  glass:new THREE.MeshPhysicalMaterial({color:0x9fb7c4,transparent:true,opacity:.22,roughness:.05}),
+  corr:new THREE.MeshStandardMaterial({map:corrTex(),roughness:.55,metalness:.35}),
+  rug:new THREE.MeshStandardMaterial({color:0x4d3a2c,roughness:1}),
+  bulb:new THREE.MeshStandardMaterial({color:0x6b4a22,emissive:0xff9a3c,emissiveIntensity:1.6}),
+};
+function box(w,h,d,mat,x,y,z,parent){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;(parent||scene).add(m);return m;}
+
+let shell=new THREE.Group(), mezG=new THREE.Group(), lowBed=new THREE.Group(), lights=new THREE.Group();
+scene.add(shell,mezG,lowBed,lights);
+
+// ---------- elementos fixos ----------
+// chão em microcimento
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(W,D),M.floor);floor.rotation.x=-Math.PI/2;floor.position.z=-D/2;floor.receiveShadow=true;scene.add(floor);
+// cozinha: bancada em linha na parede esquerda + ilha
+box(0.65,0.9,3.2,M.black,-W/2+0.33,0.45,-2.4);
+box(0.68,0.04,3.22,M.oak,-W/2+0.34,0.92,-2.4);
+box(0.35,0.7,3.2,M.black,-W/2+0.18,1.95,-2.4); // armários superiores
+box(0.5,0.02,0.6,M.white,-W/2+0.35,0.95,-2.9); // lava-loiça
+box(0.6,0.5,0.4,M.black,-W/2+0.3,1.7,-1.6); // exaustor
+box(0.9,0.92,1.9,M.oakDark,-0.9,0.46,-2.6); // ilha
+box(0.98,0.05,2.0,M.oak,-0.9,0.94,-2.6);
+for(const z of [-2.0,-2.6,-3.2]) box(0.35,0.7,0.35,M.black,-0.15,0.35,z); // bancos
+// sala
+box(2.3,0.42,0.95,M.sofa,0.2,0.21,-5.4);box(2.3,0.45,0.22,M.sofa,0.2,0.6,-5.9);
+box(0.22,0.6,0.95,M.sofa,-0.95,0.3,-5.4);box(0.22,0.6,0.95,M.sofa,1.35,0.3,-5.4);
+const rug=new THREE.Mesh(new THREE.PlaneGeometry(2.8,2),M.rug);rug.rotation.x=-Math.PI/2;rug.position.set(0.2,0.005,-4.5);rug.receiveShadow=true;scene.add(rug);
+box(1.2,0.38,0.6,M.oak,0.2,0.19,-4.3); // mesa de centro
+// casa de banho ao fundo (esquerda)
+const bx0=-W/2, bx1=-0.4, bz0=-8.6;
+box(0.1,2.4,D+bz0,M.wall,bx1,1.2,(bz0-D)/2); // parede lateral (com porta simulada)
+box(bx1-bx0,2.4,0.1,M.wall,(bx0+bx1)/2,1.2,bz0);
+box(0.8,2.05,0.04,M.oakDark,(bx0+bx1)/2+0.6,1.03,bz0+0.06); // porta de madeira
+box(1.0,0.06,0.9,M.white,-W/2+0.6,0.85,-10.4); // lavatório
+box(0.9,0.02,1.4,M.white,-1.1,0.02,-10.2); // base de duche
+box(0.45,0.4,0.6,M.white,-W/2+0.4,0.2,-9.3); // sanita
+// arrumos / lavandaria (direita, ao fundo)
+box(2.2,2.2,0.6,M.oakDark,1.85,1.1,-10.65);
+
+// ---------- conteúdo dependente da altura ----------
+function clear(g){while(g.children.length){const c=g.children.pop();}}
+function buildShell(){
+  clear(shell);
+  const pl=(w,h,mat,x,y,z,ry)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),mat);m.position.set(x,y,z);m.rotation.y=ry;m.receiveShadow=true;shell.add(m);return m;};
+  pl(D,H,M.wall,-W/2,H/2,-D/2,Math.PI/2);       // esquerda
+  pl(D,H,M.wall, W/2,H/2,-D/2,-Math.PI/2);      // direita
+  pl(W,H,M.wall,0,H/2,-D,0);                    // fundo
+  const ceil=new THREE.Mesh(new THREE.PlaneGeometry(W,D),M.beam);ceil.rotation.x=Math.PI/2;ceil.position.set(0,H,-D/2);shell.add(ceil);
+  for(let z=-0.5;z>-D;z-=1.0) box(W,0.22,0.14,M.beam,0,H-0.11,z,shell); // vigas de madeira
+  // fachada: portas de contentor + porta de vidro
+  box(1.4,2.5,0.06,M.glass,0,1.25,0.0,shell);
+  box(1.5,0.08,0.1,M.black,0,2.54,0,shell);
+  const doorL=new THREE.Group();doorL.position.set(-0.75,0,0.05);doorL.rotation.y=1.75;
+  box(2.2,2.5,0.06,M.corr,-1.1,1.25,0,doorL);shell.add(doorL);
+  const doorR=new THREE.Group();doorR.position.set(0.75,0,0.05);doorR.rotation.y=-1.75;
+  box(2.2,2.5,0.06,M.corr,1.1,1.25,0,doorR);shell.add(doorR);
+  if(H>3) box(W,H-2.6,0.06,M.glass,0,2.6+(H-2.6)/2,0,shell); // bandeira envidraçada por cima
+  box(0.08,H,0.12,M.beam,-0.75,H/2,0,shell);box(0.08,H,0.12,M.beam,0.75,H/2,0,shell);
+}
+function buildMez(){
+  clear(mezG);clear(lowBed);
+  if(H>3){
+    const depth=D+MEZ_Z; // 5 m
+    box(W,0.2,depth,M.oak,0,MEZ_TOP-0.1,MEZ_Z-depth/2,mezG);
+    for(const x of [-2.2,0,2.2]) box(0.16,0.3,depth,M.beam,x,MEZ_TOP-0.35,MEZ_Z-depth/2,mezG); // vigas
+    box(0.14,MEZ_TOP-0.2,0.14,M.beam,-1.8,(MEZ_TOP-0.2)/2,MEZ_Z+0.07,mezG); // pilar
+    box(0.14,MEZ_TOP-0.2,0.14,M.beam,1.6,(MEZ_TOP-0.2)/2,MEZ_Z+0.07,mezG);
+    // guarda em ripado de madeira
+    box(W-1.0,0.06,0.08,M.oakDark,-0.5,MEZ_TOP+1.0,MEZ_Z+0.04,mezG);
+    for(let x=-W/2+0.1;x<W/2-1.0;x+=0.12) box(0.04,1.0,0.04,M.oakDark,x,MEZ_TOP+0.5,MEZ_Z+0.04,mezG);
+    // escada de madeira junto à parede direita
+    const steps=15, rise=MEZ_TOP/steps, run=0.27, x=W/2-0.5;
+    for(let i=0;i<steps;i++){box(0.9,0.05,0.3,M.oak,x,rise*(i+1)-0.025,MEZ_Z+0.15+(steps-1-i)*run,mezG);}
+    const len=Math.hypot(steps*run,MEZ_TOP);
+    const str=box(0.06,0.25,len,M.beam,x-0.48,MEZ_TOP/2,MEZ_Z+steps*run/2,mezG);
+    str.rotation.x=Math.atan2(MEZ_TOP,steps*run);
+    const str2=str.clone();str2.position.x=x+0.48;mezG.add(str2);
+    // quarto
+    box(1.7,0.35,2.1,M.oakDark,0,MEZ_TOP+0.17,-9.2,mezG);
+    box(1.65,0.2,2.0,M.linen,0,MEZ_TOP+0.45,-9.2,mezG);
+    box(1.7,0.9,0.08,M.oak,0,MEZ_TOP+0.5,-10.3,mezG);
+    box(0.45,0.45,0.4,M.oak,-1.2,MEZ_TOP+0.22,-10.0,mezG);box(0.45,0.45,0.4,M.oak,1.2,MEZ_TOP+0.22,-10.0,mezG);
+  }else{
+    // piso único: cama entre a sala e a casa de banho
+    box(1.7,0.35,2.1,M.oakDark,1.6,0.17,-7.6,lowBed);
+    box(1.65,0.2,2.0,M.linen,1.6,0.45,-7.6,lowBed);
+    box(0.08,2.2,2.4,M.oak,0.55,1.1,-7.6,lowBed); // divisória em ripado
+  }
+}
+function buildLights(){
+  clear(lights);
+  scene.children.filter(o=>o.isLight).forEach(l=>scene.remove(l));
+  scene.add(new THREE.HemisphereLight(0x9fb2c4,0x2a1e14,0.35));
+  const sun=new THREE.DirectionalLight(0xcfe0ee,0.22);sun.position.set(1,4,6);sun.target.position.set(0,0,-5);scene.add(sun,sun.target);
+  // pendentes sobre a sala
+  const drops=H>3?[[-.6,-3.6,2.4],[.3,-4.2,1.9],[1,-3.9,2.8],[-.2,-4.8,2.2],[.8,-5.1,3.1]]:[[-.9,-2.6,1.9],[.3,-4.4,1.95]];
+  drops.forEach(([x,z,y],i)=>{
+    const cord=new THREE.Mesh(new THREE.CylinderGeometry(.006,.006,H-y),M.black);cord.position.set(x,y+(H-y)/2,z);lights.add(cord);
+    const b=new THREE.Mesh(new THREE.SphereGeometry(.09,16,12),M.bulb);b.position.set(x,y,z);lights.add(b);
+    if(i<3){const p=new THREE.PointLight(0xffb468,1.4,9,2);p.position.set(x,y-.1,z);if(i===0){p.castShadow=true;p.shadow.mapSize.set(1024,1024);}scene.add(p);}
+  });
+  // apliques de parede
+  [[-W/2+.06,1.9,-6.5],[W/2-.06,1.9,-7.5],[-W/2+.06,MEZ_TOP+1.4,-9],[W/2-.06,2.2,-1.5]].forEach(([x,y,z])=>{
+    if(H<3&&y>2.3)return;
+    const p=new THREE.PointLight(0xffa552,.7,4,2);p.position.set(x+(x<0?.2:-.2),y,z);scene.add(p);
+    box(.06,.18,.08,M.bulb,x,y,z,lights);
+  });
+  const k=new THREE.PointLight(0xffc98a,.8,5,2);k.position.set(-2,1.7,-2.4);scene.add(k); // luz da cozinha
+}
+
+// ---------- áreas ----------
+function areas(){
+  const piso=W*D, mez=H>3?W*(D+MEZ_Z):0;
+  const rows=[['Piso térreo',piso],['Mezanino',mez],['Total útil aprox.',piso+mez],['Casa de banho',(bx1-bx0)*(D+bz0)]];
+  document.getElementById('areas').innerHTML=rows.map(([k,v])=>`<dt>${k}</dt><dd>${v.toFixed(1).replace('.',',')} m²</dd>`).join('');
+}
+
+// ---------- vistas ----------
+const views={
+  geral:{p:()=>[5.5,H+3.2,4.5],t:()=>[0,1.2,-5.5]},
+  entrada:{p:()=>[0.2,1.6,-0.4],t:()=>[0,1.5,-8]},
+  mez:{p:()=>[1.5,H>3?MEZ_TOP+1.6:1.6,H>3?-9.5:-9.8],t:()=>[-0.8,1,-1.5]},
+  planta:{p:()=>[0,18,-5.49],t:()=>[0,0,-5.5]},
+};
+let anim=null;
+function go(name){
+  const v=views[name];document.querySelectorAll('.views button').forEach(b=>b.setAttribute('aria-pressed',b.id==='v-'+name));
+  const to={p:new THREE.Vector3(...v.p()),t:new THREE.Vector3(...v.t())};
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){camera.position.copy(to.p);controls.target.copy(to.t);return;}
+  anim={from:{p:camera.position.clone(),t:controls.target.clone()},to,t:0};
+}
+['geral','entrada','mez','planta'].forEach(n=>document.getElementById('v-'+n).onclick=()=>go(n));
+
+function setH(h){
+  H=h;
+  document.getElementById('h-alto').setAttribute('aria-pressed',h>3);
+  document.getElementById('h-baixo').setAttribute('aria-pressed',h<3);
+  document.getElementById('h-note').textContent=h>3
+    ?'Hipótese: a loja tem 2,40 + 3,20 m livres. O quarto fica num mezanino de madeira sobre a metade do fundo.'
+    :'Se a loja só tiver 2,40 m, não cabe mezanino: fica tudo num piso, com o quarto separado por um ripado antes da casa de banho.';
+  buildShell();buildMez();buildLights();areas();
+}
+document.getElementById('h-alto').onclick=()=>setH(5.6);
+document.getElementById('h-baixo').onclick=()=>setH(2.4);
+
+function resize(){const r=stage.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(stage);
+
+setH(5.6);
+camera.position.set(...views.geral.p());controls.target.set(...views.geral.t());
+resize();
+(function loop(){
+  requestAnimationFrame(loop);
+  if(anim){anim.t=Math.min(1,anim.t+0.025);const e=1-Math.pow(1-anim.t,3);
+    camera.position.lerpVectors(anim.from.p,anim.to.p,e);controls.target.lerpVectors(anim.from.t,anim.to.t,e);if(anim.t>=1)anim=null;}
+  controls.update();renderer.render(scene,camera);
+})();
+})();
+</script>
+
+</body>
+</html>
